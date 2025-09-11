@@ -11,36 +11,46 @@
 최초 로그인 또는 회원가입 시의 흐름입니다.
 
 1.  **클라이언트 → 인증 서버**: 클라이언트가 카카오 로그인을 요청합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 46 18" src="https://github.com/user-attachments/assets/028e4fe9-f801-46d7-914f-5d1e8d6a7fe1" />
+<img width="984" height="472" alt="스크린샷 2025-09-11 오후 5 46 18" src="https://github.com/user-attachments/assets/31d7dbcd-182e-40c6-9788-8670f8bd05ad" />
+
 2.  **인증 서버**: 카카오 콜백(callback)을 통해 인증을 처리합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 47 15" src="https://github.com/user-attachments/assets/f7a699d0-31e6-4410-9157-f152e2843433" />
+<img width="1016" height="489" alt="스크린샷 2025-09-11 오후 5 47 15" src="https://github.com/user-attachments/assets/249b671f-8e43-449a-9d33-4304330b1717" />
+
 
 3.  **인증 서버 → 메인 서버**: 카카오로부터 받은 사용자 정보를 이용해 우리 서비스에 이미 가입된 유저인지 메인 서버에 조회를 요청합니다.
 4.  **메인 서버 → 인증 서버**:
     *   **기존 유저**: 유저 정보를 응답합니다.
     *   **신규 유저**: 유저가 없음을 응답합니다. 이 경우, 인증 서버는 메인 서버에 새로운 유저 생성을 요청합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 48 20" src="https://github.com/user-attachments/assets/89800bfc-f60c-4d4e-a6eb-2cad3d548f98" />
+<img width="1000" height="462" alt="스크린샷 2025-09-11 오후 5 48 20" src="https://github.com/user-attachments/assets/3d4643fa-6aec-4c40-9285-2b89b3d72af8" />
+
 
 5.  **인증 서버 → 클라이언트**: 유저 정보 확인 또는 생성이 완료되면, 서비스 전용 토큰(Access Token, Refresh Token)을 생성하여 클라이언트에게 전달합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 53 35" src="https://github.com/user-attachments/assets/6880ce93-3bc8-48ae-aaf4-b891de87a087" />
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 55 16" src="https://github.com/user-attachments/assets/9ee3b40b-cf8e-47d2-8d5c-74f9c3842c93" />
+<img width="1037" height="531" alt="스크린샷 2025-09-11 오후 5 53 35" src="https://github.com/user-attachments/assets/6f5cfbff-27a4-4da1-b94e-60fde8df4d98" />
+
+<img width="1013" height="478" alt="스크린샷 2025-09-11 오후 5 55 16" src="https://github.com/user-attachments/assets/a035e804-3301-4757-ac94-de9649934203" />
+
 
 ### 2. 인증 후 API 요청 흐름
 
 Access Token을 발급받은 이후의 일반적인 API 요청 흐름입니다.
 
 1.  **클라이언트 → 인증 서버**: 클라이언트가 Access Token을 헤더에 담아 API를 요청합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 58 00" src="https://github.com/user-attachments/assets/18fe1da8-3b0a-41f0-bdd5-7e7ca69c67d4" />
+<img width="1031" height="433" alt="스크린샷 2025-09-11 오후 5 58 00" src="https://github.com/user-attachments/assets/f6c16e87-8abc-4efc-956a-0fe3fd01416d" />
+
 
 2.  **인증 서버**: 전달받은 Access Token의 유효성을 검증합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 58 33" src="https://github.com/user-attachments/assets/f0b687b0-dfe8-43c1-9005-ed142459983e" />
+<img width="1014" height="449" alt="스크린샷 2025-09-11 오후 5 58 33" src="https://github.com/user-attachments/assets/56213643-404a-4b35-b123-26748793e373" />
+
 
 3.  **인증 서버 → 메인 서버**: 토큰 검증이 완료되면, 해당 요청을 메인 서버로 전달합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 59 30" src="https://github.com/user-attachments/assets/4ccadb30-feed-47c6-bddb-c491f66f5213" />
+<img width="1031" height="440" alt="스크린샷 2025-09-11 오후 5 59 30" src="https://github.com/user-attachments/assets/13848fe9-da87-4c3e-8cd4-a10ca115649d" />
+
 
 4.  **메인 서버 → 인증 서버 → 클라이언트**: 메인 서버의 처리 결과를 인증 서버를 거쳐 클라이언트에게 최종 응답합니다.
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 5 59 53" src="https://github.com/user-attachments/assets/b7b6fa8a-dfd7-42e5-b178-9c628543662d" />
-<img width="1440" height="900" alt="스크린샷 2025-09-11 오후 6 00 32" src="https://github.com/user-attachments/assets/860b4b73-ca15-4978-be2d-4eeb2518d974" />
+<img width="1007" height="432" alt="스크린샷 2025-09-11 오후 5 59 53" src="https://github.com/user-attachments/assets/761ec702-e8f2-439e-a89a-7ca1e63b61d2" />
+
+<img width="1013" height="408" alt="스크린샷 2025-09-11 오후 6 00 32" src="https://github.com/user-attachments/assets/d603fed6-4987-4023-a4bb-c2513e1b79b9" />
+
 
 
 ---
