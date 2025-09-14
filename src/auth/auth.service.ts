@@ -19,6 +19,11 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {
     this.MAIN_SERVER_URL = this.configService.get('MAIN_SERVER_URL');
+    if (!this.MAIN_SERVER_URL) {
+      this.logger.warn(
+        'MAIN_SERVER_URL이 설정되지 않았습니다. 목(mock) 모드로 동작합니다.',
+      );
+    }
   }
 
   async kakaoLogin(user: SocialUser) {
@@ -42,6 +47,11 @@ export class AuthService {
   }
 
   private async findUserByProviderId(provider: string, providerId: string) {
+    if (!this.MAIN_SERVER_URL) {
+      this.logger.log('MOCKING: findUserByProviderId - 항상 null을 반환합니다.');
+      return null;
+    }
+
     const url = `${this.MAIN_SERVER_URL}/users/provider/${provider}/${providerId}`;
     this.logger.log(`메인 서버에 유저 조회 요청: ${url}`);
 
@@ -64,6 +74,14 @@ export class AuthService {
   }
 
   private async createUser(user: SocialUser) {
+    if (!this.MAIN_SERVER_URL) {
+      this.logger.log('MOCKING: createUser - 목업 유저를 생성합니다.');
+      return {
+        id: `mock-${Date.now()}`,
+        ...user,
+      };
+    }
+
     const url = `${this.MAIN_SERVER_URL}/users`;
     this.logger.log(`메인 서버에 유저 생성 요청: ${url}`);
 
