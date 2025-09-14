@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
+import { SocialUser } from './interfaces/social-user.interface';
 
 @Injectable()
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
@@ -13,16 +14,17 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   }
 
   async validate(
-    accessToken: string,
-    refreshToken: string,
+    _accessToken: string,
+    _refreshToken: string,
     profile: any,
-    done: any,
-  ): Promise<any> {
-    const user = {
-      kakaoId: profile.id,
-      email: profile._json.kakao_account.email,
+  ): Promise<SocialUser> {
+    const user: SocialUser = {
+      provider: 'kakao',
+      providerId: String(profile.id),
       name: profile.displayName,
+      profileImage: profile._json.properties?.profile_image,
     };
+
     return user;
   }
 }
