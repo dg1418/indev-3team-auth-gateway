@@ -3,9 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { KakaoStrategy } from './kakao.strategy';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [PassportModule],
+  imports: [PassportModule, HttpModule],
   controllers: [AuthController],
   providers: [AuthService, KakaoStrategy],
 })

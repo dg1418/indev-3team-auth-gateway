@@ -1,6 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { SocialUser } from './interfaces/social-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +15,7 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoLoginCallback(@Req() req) {
-    return req.user;
+  async kakaoLoginCallback(@Req() req: { user: SocialUser }) {
+    return this.authService.kakaoLogin(req.user);
   }
 }
