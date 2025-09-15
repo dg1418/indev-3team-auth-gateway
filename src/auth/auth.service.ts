@@ -39,9 +39,14 @@ export class AuthService {
       this.logger.log('기존 유저 확인', appUser);
     }
 
+    const [accessToken, refreshToken] = await Promise.all([
+      this.issueToken(appUser, false),
+      this.issueToken(appUser, true),
+    ]);
+
     return {
-      accessToken: await this.issueToken(appUser, true),
-      refreshToken: await this.issueToken(appUser, true),
+      accessToken,
+      refreshToken,
     };
   }
 
