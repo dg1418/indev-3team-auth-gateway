@@ -1,7 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { SocialUser } from './interfaces/social-user.interface';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +16,20 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoLoginCallback(@Req() req: { user: SocialUser }) {
-    return this.authService.kakaoLogin(req.user);
+  async kakaoLoginCallback(
+    @Req() req: { user: SocialUser },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.kakaoLogin(
+      req.user,
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      // secure: true, // TODO: HTTPS 적용 시 주석 해제
+      sameSite: 'strict',
+    });
+
+    return { accessToken };
   }
 }
