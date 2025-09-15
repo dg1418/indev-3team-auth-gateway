@@ -1,13 +1,10 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { catchError, firstValueFrom } from 'rxjs';
 import { SocialUser } from './interfaces/social-user.interface';
+import { envVariableKeys } from './const/env.const';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {
     this.MAIN_SERVER_URL = this.configService.get('MAIN_SERVER_URL');
     if (!this.MAIN_SERVER_URL) {
@@ -29,26 +27,29 @@ export class AuthService {
   async kakaoLogin(user: SocialUser) {
     this.logger.log('카카오 로그인 시작', user);
 
-    const existingUser = await this.findUserByProviderId(
+    let appUser = await this.findUserByProviderId(
       user.provider,
       user.providerId,
     );
 
-    if (existingUser) {
-      this.logger.log('기존 유저 확인', existingUser);
-      // TODO: JWT 토큰 생성 및 반환
-      return existingUser;
+    if (!appUser) {
+      this.logger.log('신규 유저 생성');
+      appUser = await this.createUser(user);
+    } else {
+      this.logger.log('기존 유저 확인', appUser);
     }
 
-    this.logger.log('신규 유저 생성');
-    const newUser = await this.createUser(user);
-    // TODO: JWT 토큰 생성 및 반환
-    return newUser;
+    return {
+      accessToken: await this.issueToken(appUser, true),
+      refreshToken: await this.issueToken(appUser, true),
+    };
   }
 
   private async findUserByProviderId(provider: string, providerId: string) {
     if (!this.MAIN_SERVER_URL) {
-      this.logger.log('MOCKING: findUserByProviderId - 항상 null을 반환합니다.');
+      this.logger.log(
+        'MOCKING: findUserByProviderId - 항상 null을 반환합니다.',
+      );
       return null;
     }
 
@@ -98,5 +99,26 @@ export class AuthService {
     );
 
     return data;
+  }
+
+  async issueToken(user: { id: number }, isRefreshToken: boolean) {
+    const refreshTokenSecret = this.configService.get<string>(
+      envVariableKeys.refreshTokenSecret,
+    );
+
+    const accessTokenSecret = this.configService.get<string>(
+      envVariableKeys.accessTokenSecret,
+    );
+
+    return this.jwtService.signAsync(
+      {
+        sub: user.id,
+        type: isRefreshToken ? 'refresh' : 'access',
+      },
+      {
+        secret: isRefreshToken ? refreshTokenSecret : accessTokenSecret,
+        expiresIn: isRefreshToken ? '24h' : 300,
+      },
+    );
   }
 }
